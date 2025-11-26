@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Streamlit cache
+.streamlit/
+
+# Data - KHÔNG PUSH dữ liệu thật lên GitHub
+data/raw/*.csv
+data/raw/*.har
+data/cookie/*.txt
+data/dwh/*.csv
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
