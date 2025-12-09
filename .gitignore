@@ -12,10 +12,12 @@ venv/
 .streamlit/
 
 # Data - KHÔNG PUSH dữ liệu thật lên GitHub
-data/raw/*.csv
-data/raw/*.har
+# data/raw/*.csv
+# data/raw/*.har
 data/cookie/*.txt
-data/dwh/*.csv
+# data/dwh/*.csv
+.db
+
 
 # VSCode
 .vscode/

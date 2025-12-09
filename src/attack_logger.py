@@ -98,7 +98,7 @@ def main():
         if SLEEP_BETWEEN_EVENTS > 0:
             time.sleep(SLEEP_BETWEEN_EVENTS)
 
-    print("✅ Hoàn tất sinh log attack giả lập.")
+    print("Hoàn tất sinh log attack giả lập.")
 
 
 if __name__ == "__main__":
