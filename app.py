@@ -1,37 +1,19 @@
-# import streamlit as st
-# st.set_page_config(page_title="Mini SIEM – Dashboard", layout="wide")
-
-# import pandas as pd
-# import plotly.express as px
-
-
-# # ============================
-# # LOAD DATA
-# # ============================
-
-# @st.cache_data
-# def load_data():
-#     df = pd.read_csv("data/dwh/dwh_requests.csv")
-#     df["time"] = pd.to_datetime(df["time"], errors="coerce")
-#     return df
-
-# df = load_data()
-
 import streamlit as st
 import pandas as pd
-import plotly.express as px 
+import plotly.express as px
 
 st.set_page_config(page_title="Mini SIEM – Dashboard", layout="wide")
 
-DATA_OPTION = st.sidebar.selectbox(
-    "Chọn dataset",
-    ["DWH gốc (log thật)", "DWH cân bằng lớn (augment)"]
-)
+# ============================
+# LOAD DATA (Cố định 1 dataset)
+# ============================
 
-if DATA_OPTION == "DWH gốc (log thật)":
-    df = pd.read_csv("data/dwh/dwh_requests.csv", parse_dates=["time"])
-else:
+@st.cache_data
+def load_data():
     df = pd.read_csv("data/dwh/dwh_requests_balanced_big.csv", parse_dates=["time"])
+    return df
+
+df = load_data()
 
 # ============================
 # KPI SECTION
@@ -95,8 +77,12 @@ with col5:
     top_susp = df_susp["path"].value_counts().reset_index()
     top_susp.columns = ["path", "count"]
 
-    fig_susp = px.bar(top_susp.head(10), x="count", y="path",
-                      orientation="h", title="Top 10 suspicious URL (4xx)")
+    fig_susp = px.bar(
+        top_susp.head(10),
+        x="count", y="path",
+        orientation="h",
+        title="Top 10 suspicious URL (4xx)"
+    )
     st.plotly_chart(fig_susp, use_container_width=True)
 
 # ============================
@@ -106,10 +92,19 @@ with col5:
 with col6:
     st.subheader("Endpoint chậm – Wait Time cao")
 
-    df_slow = df.groupby("path")["wait_ms"].mean().sort_values(ascending=False).reset_index()
+    df_slow = (
+        df.groupby("path")["wait_ms"]
+          .mean()
+          .sort_values(ascending=False)
+          .reset_index()
+    )
 
-    fig_slow = px.bar(df_slow.head(10), x="wait_ms", y="path",
-                      orientation="h", title="Top 10 slow endpoints")
+    fig_slow = px.bar(
+        df_slow.head(10),
+        x="wait_ms", y="path",
+        orientation="h",
+        title="Top 10 slow endpoints"
+    )
     st.plotly_chart(fig_slow, use_container_width=True)
 
 st.markdown("---")
@@ -119,7 +114,6 @@ st.markdown("---")
 # ============================
 
 st.subheader("Bảng request chi tiết")
-
 st.dataframe(df.head(500), use_container_width=True)
 
 # ============================
@@ -129,13 +123,12 @@ st.dataframe(df.head(500), use_container_width=True)
 st.subheader("Phát hiện bất thường (Simple Rules)")
 
 traffic_threshold = df_time["count"].mean() * 3
-
 st.write(f"- Ngưỡng spike traffic: > {traffic_threshold:.1f} request/min")
 
 anomalies = df_time[df_time["count"] > traffic_threshold]
 
 if len(anomalies) > 0:
-    st.error("PHÁT HIỆN TRAFFIC SPiKE!")
+    st.error("PHÁT HIỆN TRAFFIC SPIKE!")
     st.dataframe(anomalies)
 else:
     st.success("Không phát hiện spike bất thường.")
